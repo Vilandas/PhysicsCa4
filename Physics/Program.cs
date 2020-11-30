@@ -3,7 +3,7 @@ using static Physics.Enums;
 
 namespace Physics
 {
-    //Paudric Smith - D00219343
+    //Paudric Smith - D00215637
     //Vilandas Morrissey - D00218436
 
     public class Program
@@ -27,10 +27,18 @@ namespace Physics
             Console.WriteLine("PV(0):\n" + new Vector2(prop.Position, prop.Velocity));
             while(prop.Position.Z > 0)
             {
-                prop.Time += prop.Steps;
                 Vector2 pvt = p.CalculateRk4();
-                Console.WriteLine("\nPV(" + prop.Time + "):\n" + pvt);
-                p.UpdatePV(pvt);
+                if (pvt.X.IsZero() && pvt.Y.IsZero())
+                {
+                    Console.WriteLine("\nStatic object");
+                    return;
+                }
+                else
+                {
+                    prop.Time += prop.Steps;
+                    Console.WriteLine("\nPV(" + prop.Time + "):\n" + pvt);
+                    p.UpdatePV(pvt);
+                }
             }
             p.Data.ExportData();
             prop.Time = prop.OriginalTime;

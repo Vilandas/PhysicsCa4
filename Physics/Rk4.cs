@@ -85,6 +85,11 @@ namespace Physics
         {
             Vector2 pv0 = new Vector2(prop.Position, prop.Velocity);
             Vector2 k1 = F(pv0) * prop.Steps;
+
+            //Acceleration static, not moving
+            if (k1.Y.IsZero())
+                return new Vector2(Vector3.Zero(), Vector3.Zero());
+
             Vector2 k2 = F(pv0 + (k1 / 2)) * prop.Steps;
             Vector2 k3 = F(pv0 + (k2 / 2)) * prop.Steps;
             Vector2 k4 = F(pv0 + k3) * prop.Steps;
