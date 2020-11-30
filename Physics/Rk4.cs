@@ -29,26 +29,44 @@ namespace Physics
         public void Start()
         {
             CalculateRk4();
-            Eulers(CalculateAcceleration(prop.Velocity));
-
+            Eulers(CalculateAcceleration());
         }
 
-        public Vector3 CalculateAcceleration(Vector3 velocity)
+        //F̅g = -mgk̂
+        public Vector3 ForceGravity()
         {
-            //Vector3 va = Vector3.Subtract(velocity, prop.FlowRate);
+            return Vector3.Multiply(Vector3.Up(), (-prop.Mass * prop.Gravity));
+        }
 
-            //Vector3 fGravity = ForceGravity();
-            //Vector3 fDrag = ForceDrag(va);
-            //Vector3 fMagnus = ForceMagnus(va);
+        //F̅gn = [F̅g.N̂][N̂]
+        public Vector3 ForceGravityNormal(Vector3 _Fg)
+        {
+            Vector3 normalHat = Vector3.Normalise(prop.CurrentNormal);
+            return Vector3.Dot(_Fg, normalHat) * normalHat;
+        }
 
-            //Vector3 fNet = fGravity + fDrag + fMagnus;
+        public Vector3 CalculateAcceleration()
+        {
+            Vector3 _Fg = ForceGravity();
+            Vector3 _Fgn = ForceGravityNormal(_Fg);
+            Vector3 _Fgp = _Fg - _Fgn;
+            Vector3 _Fn = _Fgn * -1;
+            double friction = prop.CurrentMuStatic * _Fn.Length;
 
-            //Vector3 acceleration = Vector3.Multiply(fNet, 1d / prop.Mass);
+            //F̅net = 0
+            if (friction >= _Fgp.Length)
+            {
+                return Vector3.Zero();
+            }
 
-            //data.AddForces(fGravity, fDrag, fMagnus, fNet);
+            friction = prop.CurrentMuKinetic * _Fn.Length;
+            Vector3 _FfUnit = Vector3.Normalise(_Fgp) * -1;
+            Vector3 _Ff = friction * _FfUnit;
 
-            //return acceleration;
-            return Vector3.Zero();
+            Vector3 _Fnet = _Fgn + _Fgp + _Fn + _Ff;
+            Vector3 acceleration = (1d / prop.Mass) * _Fnet;
+
+            return acceleration;
         }
 
         public void Eulers(Vector3 acceleration)
@@ -56,7 +74,7 @@ namespace Physics
             double t1 = prop.Time + prop.Steps;
             Vector3 p1 = prop.Position + (prop.Velocity * prop.Steps);
             Vector3 v1 = prop.Velocity + (acceleration * prop.Steps);
-            Vector3 a1 = CalculateAcceleration(v1);
+            Vector3 a1 = CalculateAcceleration();
             Console.WriteLine("\nEulers: ");
             Console.WriteLine("p1: " + p1);
             Console.WriteLine("v1: " + v1);
@@ -73,14 +91,14 @@ namespace Physics
             Vector2 k = (k1 + (k2 * 2) + (k3 * 2) + k4) * (1d / 6d);
             Vector2 pv1 = pv0 + k;
 
-            data.AddRK4(pv0, k1, k2, k3, k4, k, prop.Time);
+            //data.AddRK4(pv0, k1, k2, k3, k4, k, prop.Time);
 
             return pv1;
         }
 
         public Vector2 F(Vector2 pv)
         {
-            Vector3 acceleration = CalculateAcceleration(pv.Y);
+            Vector3 acceleration = CalculateAcceleration();
             return new Vector2(pv.Y, acceleration);
         }
 

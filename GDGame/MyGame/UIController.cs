@@ -674,7 +674,7 @@ namespace GDGame
             infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
             "\n Mass: " + p.Mass + " \n Dimensions: " + p.Dimensions + " \n Position: " + p.Position +
             "\n Velocity: " + p.Velocity +
-            "\n Acceleration: " + rk4.CalculateAcceleration(p.Velocity);
+            "\n Acceleration: " + rk4.CalculateAcceleration();
 
             step = false;
         }

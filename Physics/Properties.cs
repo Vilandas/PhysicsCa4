@@ -15,6 +15,9 @@ namespace Physics
         private Vector3 dimensions;
         private Vector3 position, originalPosition;
         private Vector3 velocity, originalVelocity;
+        private Vector3 currentNormal;
+        private double currentMuStatic;
+        private double currentMuKinetic;
         private List<Plane> planes;
 
         #endregion
@@ -81,6 +84,21 @@ namespace Physics
             get { return originalVelocity; }
             set { originalVelocity = value; }
         }
+        public Vector3 CurrentNormal
+        {
+            get { return currentNormal; }
+            set { currentNormal = value; }
+        }
+        public double CurrentMuStatic
+        {
+            get { return currentMuStatic; }
+            set { currentMuStatic = value; }
+        }
+        public double CurrentMuKinetic
+        {
+            get { return currentMuKinetic; }
+            set { currentMuKinetic = value; }
+        }
         public Vector3 Centre
         {
             get 
@@ -110,9 +128,17 @@ namespace Physics
             this.position = this.originalPosition = position;
             this.velocity = this.originalVelocity = velocity;
             this.planes = planes;
+            SetPlane(0);
         }
 
         #endregion
+
+        public void SetPlane(int index)
+        {
+            currentMuStatic = planes[index].MuStatic;
+            currentMuKinetic = planes[index].MuKinetic;
+            currentNormal = planes[index].Normal;
+        }
 
         public void DisplayDetails()
         {
