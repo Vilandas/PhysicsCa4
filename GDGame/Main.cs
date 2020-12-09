@@ -93,15 +93,15 @@ namespace GDGame
             //cameras - notice we moved the camera creation BELOW where we created the drawn content - see DriveController
             InitCameras3D();
 
-            InitBall();
+            InitBox();
 
             //graphic settings - see https://en.wikipedia.org/wiki/Display_resolution#/media/File:Vector_Video_Standards8.svg
             InitGraphics(1440, 1050);
 
             //debug info
-            InitDebug();
+            //InitDebug();
 
-            uiController = new UIController(this, keyboardManager, box, cameraManager[0]);
+            uiController = new UIController(this, objectManager, keyboardManager, box, cameraManager[0], archetypalTexturedQuad);
             Components.Add(uiController);
 
             base.Initialize();
@@ -251,9 +251,9 @@ namespace GDGame
             InitGround();
         }
 
-        private void InitBall()
+        private void InitBox()
         {
-            ////////Ball
+            ////////Box
             //transform
             Transform3D transform3D = new Transform3D(new Vector3(0, 100, 0),
                                 new Vector3(0, 0, 0),       //rotation
@@ -266,16 +266,11 @@ namespace GDGame
                 crate,
                 Color.White, 1);
 
-            ModelObject modelObject = new ModelObject("Ball", ActorType.Primitive,
+            ModelObject modelObject = new ModelObject("Box", ActorType.Primitive,
                 StatusType.Drawn | StatusType.Update, transform3D,
                 effectParameters, cube);
 
             box = modelObject;
-
-            //ThirdPersonFollowCam controller = new ThirdPersonFollowCam(
-            //    keyboardManager, mouseManager, cameraManager[0]);
-
-            //ball.ControllerList.Add(controller);
 
             objectManager.Add(modelObject);
         }
@@ -478,6 +473,8 @@ namespace GDGame
             DepthStencilState dss = new DepthStencilState();
             dss.DepthBufferEnable = true;
             _graphics.GraphicsDevice.DepthStencilState = dss;
+
+            _spriteBatch.GraphicsDevice.RasterizerState = RasterizerState.CullNone;
 
             base.Draw(gameTime);
         }

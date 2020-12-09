@@ -99,6 +99,11 @@ namespace Physics
             get { return currentMuKinetic; }
             set { currentMuKinetic = value; }
         }
+        public List<Plane> Planes
+        {
+            get { return planes; }
+            set { planes = value; }
+        }
         public Vector3 Centre
         {
             get 
@@ -116,7 +121,7 @@ namespace Physics
 
         public Properties(string name, double gravity,
             double time, double steps, double mass,
-            Vector3 dimensions, Vector3 position, Vector3 velocity, List<Plane> planes)
+            Vector3 position, Vector3 dimensions, Vector3 velocity, List<Plane> planes)
         {
             this.name = name;
             this.gravity = gravity;
@@ -124,8 +129,8 @@ namespace Physics
             this.steps = this.originalSteps = steps;
             this.mass = mass;
 
-            this.dimensions = dimensions;
             this.position = this.originalPosition = position;
+            this.dimensions = dimensions;
             this.velocity = this.originalVelocity = velocity;
             this.planes = planes;
             SetPlane(0);

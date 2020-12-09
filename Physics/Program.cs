@@ -28,7 +28,7 @@ namespace Physics
             while(prop.Position.Z > 0)
             {
                 Vector2 pvt = p.CalculateRk4();
-                if (pvt.X.IsZero() && pvt.Y.IsZero())
+                if (pvt.Y.IsZero())
                 {
                     Console.WriteLine("\nStatic object");
                     return;

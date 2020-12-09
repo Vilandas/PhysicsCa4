@@ -77,7 +77,6 @@
     <Folder Include="$(MSBuildThisFileDirectory)Core\Parameters\Camera\" />
     <Folder Include="$(MSBuildThisFileDirectory)Core\Parameters\Effect\" />
     <Folder Include="$(MSBuildThisFileDirectory)Core\Parameters\Controller\" />
-    <Folder Include="$(MSBuildThisFileDirectory)Core\Parameters\Transform\" />
     <Folder Include="$(MSBuildThisFileDirectory)Core\Parameters\Vertex\" />
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
     {
         #region Fields
 
-        private Vector3 position;
+        private Vector3 offset;
         private Vector3 dimensions;
         private Vector3 normal;
         private double muStatic;
@@ -14,10 +14,10 @@
 
         #region Properties
 
-        public Vector3 Position
+        public Vector3 Offset
         {
-            get { return position; } 
-            set { position = value; }
+            get { return offset; } 
+            set { offset = value; }
         }
 
         public Vector3 Dimensions
@@ -44,25 +44,14 @@
             set { muKinetic = value; }
         }
 
-        public Vector3 Centre
-        {
-            get
-            {
-                return new Vector3(
-                    (Position.X + Dimensions.X) / 2,
-                    (Position.Y + Dimensions.Y) / 2,
-                    (Position.Z + Dimensions.Z) / 2);
-            }
-        }
-
         #endregion
 
         #region Constructor
 
-        public Plane(Vector3 position, Vector3 dimensions, Vector3 normal,
+        public Plane(Vector3 offset, Vector3 dimensions, Vector3 normal,
             double muStatic, double muKinetic)
         {
-            this.position = position;
+            this.offset = offset;
             this.dimensions = dimensions;
             this.normal = normal;
             this.muStatic = muStatic;

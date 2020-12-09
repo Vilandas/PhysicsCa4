@@ -8,6 +8,7 @@ namespace Physics
 
         private Properties prop;
         private Data data;
+        private Vector3 acceleration;
 
         #endregion
 
@@ -29,7 +30,7 @@ namespace Physics
         public void Start()
         {
             CalculateRk4();
-            Eulers(CalculateAcceleration());
+            Eulers(CalculateAcceleration(prop.Velocity));
         }
 
         //F̅g = -mgk̂
@@ -45,7 +46,7 @@ namespace Physics
             return Vector3.Dot(_Fg, normalHat) * normalHat;
         }
 
-        public Vector3 CalculateAcceleration()
+        public Vector3 CalculateAcceleration(Vector3 velocty)
         {
             Vector3 _Fg = ForceGravity();
             Vector3 _Fgn = ForceGravityNormal(_Fg);
@@ -54,7 +55,7 @@ namespace Physics
             double friction = prop.CurrentMuStatic * _Fn.Length;
 
             //F̅net = 0
-            if (friction >= _Fgp.Length)
+            if (friction >= _Fgp.Length && velocty.IsZero())
             {
                 return Vector3.Zero();
             }
@@ -74,7 +75,7 @@ namespace Physics
             double t1 = prop.Time + prop.Steps;
             Vector3 p1 = prop.Position + (prop.Velocity * prop.Steps);
             Vector3 v1 = prop.Velocity + (acceleration * prop.Steps);
-            Vector3 a1 = CalculateAcceleration();
+            Vector3 a1 = CalculateAcceleration(prop.Velocity);
             Console.WriteLine("\nEulers: ");
             Console.WriteLine("p1: " + p1);
             Console.WriteLine("v1: " + v1);
@@ -84,12 +85,13 @@ namespace Physics
         public Vector2 CalculateRk4()
         {
             Vector2 pv0 = new Vector2(prop.Position, prop.Velocity);
-            Vector2 k1 = F(pv0) * prop.Steps;
+            acceleration = prop.Steps * CalculateAcceleration(pv0.Y);
 
             //Acceleration static, not moving
-            if (k1.Y.IsZero())
-                return new Vector2(Vector3.Zero(), Vector3.Zero());
+            if (acceleration.IsZero())
+                return pv0;
 
+            Vector2 k1 = F(pv0) * prop.Steps;
             Vector2 k2 = F(pv0 + (k1 / 2)) * prop.Steps;
             Vector2 k3 = F(pv0 + (k2 / 2)) * prop.Steps;
             Vector2 k4 = F(pv0 + k3) * prop.Steps;
@@ -103,7 +105,6 @@ namespace Physics
 
         public Vector2 F(Vector2 pv)
         {
-            Vector3 acceleration = CalculateAcceleration();
             return new Vector2(pv.Y, acceleration);
         }
 

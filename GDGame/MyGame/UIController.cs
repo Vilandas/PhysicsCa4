@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using GDLibrary.Actors;
+using GDLibrary.Enums;
 using GDLibrary.Managers;
+using GDLibrary.Parameters;
 using GDLibrary.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -10,6 +13,7 @@ namespace GDGame
 {
     public class UIController : ControlManager
     {
+        private ObjectManager objectManager;
         private KeyboardManager keyboardManager;
         private TextArea infoPanel;
         private Button inputButton;
@@ -23,14 +27,19 @@ namespace GDGame
         private GameTime gameTime;
         private Camera3D camera3D;
         private Vector3 offset;
+        PrimitiveObject archetypalQuad;
+        private List<PrimitiveObject> planes;
 
         private Button[] buttons;
         private Button[] mainButtons;
         private Button[] modifySetters;
         private Button[] modifyButtons;
 
-        public UIController(Game game, KeyboardManager keyboardManager, ModelObject box, Camera3D camera3D) : base(game)
+        public UIController(Game game, ObjectManager objectManager, KeyboardManager keyboardManager,
+            ModelObject box, Camera3D camera3D, PrimitiveObject archetypalQuad)
+            : base(game)
         {
+            this.objectManager = objectManager;
             this.keyboardManager = keyboardManager;
             this.box = box;
             this.p = Physics.ExampleData.example1;
@@ -41,6 +50,8 @@ namespace GDGame
             this.useGameSpeed = false;
             this.camera3D = camera3D;
             this.offset = Vector3.Zero;
+            this.archetypalQuad = archetypalQuad;
+            this.planes = new List<PrimitiveObject>();
         }
 
         public override void InitializeComponent()
@@ -150,6 +161,8 @@ namespace GDGame
             Controls.Add(infoPanel);
 
             InitModifyMenu();
+
+            ExampleBtn_Clicked(btn1, null);
         }
 
         private void BtnGameSpeed_Clicked(object sender, EventArgs e)
@@ -599,8 +612,16 @@ namespace GDGame
             p.Time = p.OriginalTime;
 
             rk4 = new Physics.Rk4(p);
-            box.Transform3D.Translation = new Vector3((float)p.OriginalPosition.X, (float)p.OriginalPosition.Z, (float)p.OriginalPosition.Y);
-            box.Transform3D.Scale = new Vector3((float)p.Dimensions.X, (float)p.Dimensions.Y, (float)p.Dimensions.Z);
+            box.Transform3D.Translation = ToVector3(p.Position);
+            box.Transform3D.Scale = ToVector3(p.Dimensions);
+
+            foreach(PrimitiveObject plane in planes)
+            {
+                objectManager.RemoveByID(plane.ID);
+            }
+            planes.Clear();
+
+            InitPlanes();
         }
 
         private void HideMainButtons()
@@ -653,28 +674,84 @@ namespace GDGame
             base.Update(gameTime);
         }
 
+        private void InitPlanes()
+        {
+            for (int i = 0; i < p.Planes.Count; i++)
+            {
+                Physics.Plane plane = p.Planes[i];
+                PrimitiveObject planeObject = archetypalQuad.Clone() as PrimitiveObject;
+                planeObject.ID = "plane";
+                planeObject.EffectParameters.Texture = null;
+                planeObject.StatusType = StatusType.Drawn;
+                planeObject.ActorType = ActorType.Decorator;
+
+                Transform3D transform3D;
+                Vector3 yawPitchRoll = AnglesFromVector(ToVector3(plane.Normal));
+
+                if (i == 0)
+                {
+                    transform3D = new Transform3D(
+                    box.Transform3D.Translation - ToVector3(p.Dimensions / 2.6),
+                    -Vector3.UnitZ,
+                    Vector3.UnitY);
+
+                    planeObject.EffectParameters.DiffuseColor = Color.Red;
+
+                    transform3D.RotateBy(yawPitchRoll);
+                    box.Transform3D.RotateBy(yawPitchRoll);
+                }
+                else
+                {
+                    PrimitiveObject lastP = planes[i - 1];
+
+                    transform3D = new Transform3D(
+                        new Vector3(
+                            lastP.Transform3D.Translation.X + (float)plane.Offset.X,
+                            lastP.Transform3D.Translation.Y + (float)plane.Offset.Y,
+                            lastP.Transform3D.Translation.Z + (float)plane.Offset.Z),
+                        -Vector3.UnitZ,
+                        Vector3.UnitY);
+
+                    transform3D.RotateBy(yawPitchRoll);
+                }
+                transform3D.Scale = ToVector3(plane.Dimensions);
+
+                planeObject.Transform3D = transform3D;
+
+                planes.Add(planeObject);
+                objectManager.Add(planeObject);
+            }
+        }
+
         private void Run()
         {
+            Physics.Vector3 acceleration = rk4.CalculateAcceleration(p.Velocity);
             Physics.Vector2 pv = rk4.CalculateRk4();
             rk4.UpdatePV(pv);
             p.Position = pv.X;
             p.Velocity = pv.Y;
             p.Time += p.Steps;
 
-            if (p.Position.Z < 0)
+            if (p.Position.Z - p.Dimensions.Z/2 <= 0)
             {
-                p.Position.Z = 0;
+                p.Position.Z = p.Dimensions.Z/2;
                 p.Velocity.Z = 0;
-                rk4.Data.ExportData();
+                //rk4.Data.ExportData();
                 run = false;
             }
+            box.Transform3D.Translation = ToVector3(p.Position);
 
-            box.Transform3D.Translation = new Vector3((float)p.Position.X, (float)p.Position.Z, (float)p.Position.Y);
-
-            infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
+                infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
             "\n Mass: " + p.Mass + " \n Dimensions: " + p.Dimensions + " \n Position: " + p.Position +
             "\n Velocity: " + p.Velocity +
-            "\n Acceleration: " + rk4.CalculateAcceleration();
+            "\n Acceleration: " + acceleration;
+
+            if (p.Velocity.IsZero())
+            {
+                infoPanel.Text += "\n Static";
+                run = false;
+            }
+            else infoPanel.Text += "\n Kinetic";
 
             step = false;
         }
@@ -777,6 +854,27 @@ namespace GDGame
                         inputButton.Text = inputButton.Text.Remove(inputButton.Text.Length - 1);
                 }
             }
+        }
+        public Vector3 ToVector3(Physics.Vector3 pVec)
+        {
+            return new Vector3(
+                (float)pVec.X,
+                (float)pVec.Z,
+                (float)pVec.Y);
+        }
+
+        //https://www.codeproject.com/Questions/324240/Determining-yaw-pitch-and-roll
+        public Vector3 AnglesFromVector(Vector3 v)
+        {
+            Matrix matrix = Matrix.CreateLookAt(Vector3.Zero, v, Vector3.Up);
+            float yaw = (float)Math.Atan2(matrix.M13, matrix.M33);
+            float pitch = (float)Math.Asin(-matrix.M23);
+            float roll = (float)Math.Atan2(matrix.M21, matrix.M22);
+
+            return new Vector3(
+                MathHelper.ToDegrees(pitch),
+                MathHelper.ToDegrees(yaw),
+                MathHelper.ToDegrees(roll));
         }
     }
 }
