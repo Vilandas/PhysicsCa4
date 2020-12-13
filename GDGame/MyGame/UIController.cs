@@ -206,17 +206,6 @@ namespace GDGame
 
             Button b2 = new Button()
             {
-                Text = "Set Time",
-                Size = new Vector2(220, 50),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(1200, 160),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-
-            Button b3 = new Button()
-            {
                 Text = "Set Steps",
                 Size = new Vector2(220, 50),
                 BackgroundColor = Color.Black,
@@ -226,7 +215,7 @@ namespace GDGame
                 ZIndex = 0
             };
 
-            Button b4 = new Button()
+            Button b3 = new Button()
             {
                 Text = "Set Mass",
                 Size = new Vector2(220, 50),
@@ -237,9 +226,20 @@ namespace GDGame
                 ZIndex = 0
             };
 
+            Button b4 = new Button()
+            {
+                Text = "Set MuStatic",
+                Size = new Vector2(220, 50),
+                BackgroundColor = Color.Black,
+                Location = new Vector2(1200, 160),
+                IsVisible = false,
+                Enabled = false,
+                ZIndex = 0
+            };
+
             Button b5 = new Button()
             {
-                Text = "Set Position",
+                Text = "Set MuKinetic",
                 Size = new Vector2(220, 50),
                 BackgroundColor = Color.Black,
                 Location = new Vector2(1200, 370),
@@ -347,10 +347,10 @@ namespace GDGame
             };
             #endregion
 
-            #region Spin
+            #region Normal
             Button b14 = new Button()
             {
-                Text = "Spin: ",
+                Text = "Normal: ",
                 Size = new Vector2(220, 20),
                 BackgroundColor = Color.Black,
                 Location = new Vector2(960, 160),
@@ -361,7 +361,7 @@ namespace GDGame
 
             Button b15 = new Button()
             {
-                Text = "s.X",
+                Text = "n.X",
                 Size = new Vector2(73, 30),
                 BackgroundColor = Color.Black,
                 Location = new Vector2(960, 180),
@@ -371,7 +371,7 @@ namespace GDGame
             };
             Button b16 = new Button()
             {
-                Text = "s.Y",
+                Text = "n.Y",
                 Size = new Vector2(73, 30),
                 BackgroundColor = Color.Black,
                 Location = new Vector2(1033, 180),
@@ -381,7 +381,7 @@ namespace GDGame
             };
             Button b17 = new Button()
             {
-                Text = "s.Z",
+                Text = "n.Z",
                 Size = new Vector2(74, 30),
                 BackgroundColor = Color.Black,
                 Location = new Vector2(1106, 180),
@@ -391,77 +391,11 @@ namespace GDGame
             };
             #endregion
 
-            #region FlowRate
-            Button b18 = new Button()
-            {
-                Text = "Flow Rate: ",
-                Size = new Vector2(220, 20),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(960, 230),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-
-            Button b19 = new Button()
-            {
-                Text = "vw.X",
-                Size = new Vector2(73, 30),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(960, 250),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-            Button b20 = new Button()
-            {
-                Text = "vw.Y",
-                Size = new Vector2(73, 30),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(1033, 250),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-            Button b21 = new Button()
-            {
-                Text = "vw.Z",
-                Size = new Vector2(74, 30),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(1106, 250),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-            #endregion
-
-            Button b22 = new Button()
-            {
-                Text = "Set Fluid Density",
-                Size = new Vector2(220, 50),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(960, 300),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-
-            Button b23 = new Button()
-            {
-                Text = "Set Drag Coeff",
-                Size = new Vector2(220, 50),
-                BackgroundColor = Color.Black,
-                Location = new Vector2(960, 370),
-                IsVisible = false,
-                Enabled = false,
-                ZIndex = 0
-            };
-
             modifySetters = new Button[]{ b1, b2, b3, b4, b5, b6, b7, b8, b9, b10,
-                b11, b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23 };
+                b11, b12, b13, b14, b15, b16, b17 };
 
             modifyButtons = new Button[]{ b1, b2, b3, b4, b5, b6, b7, b8, b9, b10,
-                b11, b12, b13, b14, b15, b16, b17, b18, b19, b20, b21, b22, b23,
+                b11, b12, b13, b14, b15, b16, b17,
                 inputButton, back };
 
             foreach (Button button in modifySetters)
@@ -485,8 +419,11 @@ namespace GDGame
                     case "Set Gravity":
                         Physics.ExampleData.custom.Gravity = Convert.ToDouble(inputButton.Text);
                         break;
-                    case "Set Time":
-                        Physics.ExampleData.custom.Time = Convert.ToDouble(inputButton.Text);
+                    case "Set MuStatic":
+                        Physics.ExampleData.custom.Planes[0].MuStatic = Convert.ToDouble(inputButton.Text);
+                        break;
+                    case "Set MuKinetic":
+                        Physics.ExampleData.custom.Planes[0].MuKinetic = Convert.ToDouble(inputButton.Text);
                         break;
                     case "Set Steps":
                         Physics.ExampleData.custom.Steps = Physics.ExampleData.custom.OriginalSteps
@@ -521,6 +458,15 @@ namespace GDGame
                         break;
                     case "v.Z":
                         Physics.ExampleData.custom.Velocity.Z = Convert.ToDouble(inputButton.Text);
+                        break;
+                    case "n.X":
+                        Physics.ExampleData.custom.Planes[0].Normal.X = Convert.ToDouble(inputButton.Text);
+                        break;
+                    case "n.Y":
+                        Physics.ExampleData.custom.Planes[0].Normal.Y = Convert.ToDouble(inputButton.Text);
+                        break;
+                    case "n.Z":
+                        Physics.ExampleData.custom.Planes[0].Normal.Z = Convert.ToDouble(inputButton.Text);
                         break;
                 }
                 ExampleBtn_Clicked(buttons[3], null);
@@ -574,15 +520,16 @@ namespace GDGame
             }
             infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
                 "\n Mass: " + p.Mass + " \n Dimensions: " + p.Dimensions + " \n Position: " + p.OriginalPosition +
-                "\n Velocity: " + p.OriginalVelocity;
+                "\n Velocity: " + p.OriginalVelocity + "\n MuStatic: " + p.Planes[0].MuStatic + "\n MuKinetic: " + p.Planes[0].MuKinetic +
+                "\n Normal: " + p.Planes[0].Normal;
         }
 
         private void Example_MouseLeave(object sender, EventArgs e)
         {
             infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
                 "\n Mass: " + p.Mass + " \n Dimensions: " + p.Dimensions + " \n Position: " + p.Position +
-                "\n Velocity: " + p.Velocity;
-
+                "\n Velocity: " + p.Velocity + "\n MuStatic: " + p.Planes[0].MuStatic + "\n MuKinetic: " + p.Planes[0].MuKinetic +
+                "\n Normal: " + p.Planes[0].Normal;
         }
 
         private void ExampleBtn_Clicked(object sender, EventArgs e)
@@ -736,19 +683,20 @@ namespace GDGame
             {
                 p.Position.Z = p.Dimensions.Z/2;
                 p.Velocity.Z = 0;
-                //rk4.Data.ExportData();
+                rk4.Data.ExportData();
                 run = false;
             }
             box.Transform3D.Translation = ToVector3(p.Position);
 
-                infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
+            infoPanel.Text = "\n Gravity: " + p.Gravity + "\n Time: " + p.Time + " \n Step Size: " + p.Steps +
             "\n Mass: " + p.Mass + " \n Dimensions: " + p.Dimensions + " \n Position: " + p.Position +
-            "\n Velocity: " + p.Velocity +
-            "\n Acceleration: " + acceleration;
+            "\n Velocity: " + p.Velocity + "\n MuStatic: " + p.Planes[0].MuStatic + "\n MuKinetic: " + p.Planes[0].MuKinetic +
+            "\n Normal: " + p.Planes[0].Normal + "\n Acceleration: " + acceleration;
 
             if (p.Velocity.IsZero())
             {
                 infoPanel.Text += "\n Static";
+                rk4.Data.ExportData();
                 run = false;
             }
             else infoPanel.Text += "\n Kinetic";

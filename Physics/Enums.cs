@@ -40,9 +40,13 @@ namespace Physics
             Modify_Time_Steps,
 
             Modify_Mass,
-            Modify_Dimensions,
+            Modify_MuStatic,
+            Modify_MuKinetic,
+            Modify_Normal,
+
             Modify_Position,
-            Modify_Velocity
+            Modify_Velocity,
+            Modify_Dimensions
         }
     }
 }

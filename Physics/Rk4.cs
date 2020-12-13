@@ -9,6 +9,7 @@ namespace Physics
         private Properties prop;
         private Data data;
         private Vector3 acceleration;
+        private bool forcesDone;
 
         #endregion
 
@@ -54,6 +55,11 @@ namespace Physics
             Vector3 _Fn = _Fgn * -1;
             double friction = prop.CurrentMuStatic * _Fn.Length;
 
+            if (!forcesDone)
+            {
+                data.AddForces(_Fg, _Fgn, _Fgp, _Fn, friction);
+            }
+
             //F̅net = 0
             if (friction >= _Fgp.Length && velocty.IsZero())
             {
@@ -66,6 +72,11 @@ namespace Physics
 
             Vector3 _Fnet = _Fgn + _Fgp + _Fn + _Ff;
             Vector3 acceleration = (1d / prop.Mass) * _Fnet;
+
+            if(!forcesDone)
+            {
+                data.AddKinetic(friction, _FfUnit, _Ff, _Fnet, acceleration);
+            }
 
             return acceleration;
         }
@@ -84,9 +95,12 @@ namespace Physics
 
         public Vector2 CalculateRk4()
         {
+            forcesDone = false;
             Vector2 pv0 = new Vector2(prop.Position, prop.Velocity);
             acceleration = prop.Steps * CalculateAcceleration(pv0.Y);
+            forcesDone = true;
 
+            data.AddPV(pv0, prop.Time);
             //Acceleration static, not moving
             if (acceleration.IsZero())
                 return pv0;
@@ -98,7 +112,7 @@ namespace Physics
             Vector2 k = (k1 + (k2 * 2) + (k3 * 2) + k4) * (1d / 6d);
             Vector2 pv1 = pv0 + k;
 
-            //data.AddRK4(pv0, k1, k2, k3, k4, k, prop.Time);
+            data.AddRK4(k1, k2, k3, k4, k);
 
             return pv1;
         }

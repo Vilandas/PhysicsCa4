@@ -24,8 +24,13 @@ namespace Physics
         {
             Rk4 p = new Rk4(prop);
 
+            Console.WriteLine("Gravity: " + prop.Gravity);
+            Console.WriteLine("Mass: " + prop.Mass);
+            Console.WriteLine("MuStatic: " + prop.Planes[0].MuStatic);
+            Console.WriteLine("MuKinetic: " + prop.Planes[0].MuKinetic);
+            Console.WriteLine("Normal: " + prop.Planes[0].Normal);
             Console.WriteLine("PV(0):\n" + new Vector2(prop.Position, prop.Velocity));
-            while(prop.Position.Z > 0)
+            while(prop.Position.Z - prop.Dimensions.Z / 2 > 0)
             {
                 Vector2 pvt = p.CalculateRk4();
                 if (pvt.Y.IsZero())
@@ -116,6 +121,15 @@ namespace Physics
                         break;
                     case ModifyOptions.Modify_Velocity:
                         ExampleData.custom.Velocity = ExampleData.custom.OriginalVelocity = GetVector();
+                        break;
+                    case ModifyOptions.Modify_MuStatic:
+                        ExampleData.custom.Planes[0].MuStatic = GetDouble();
+                        break;
+                    case ModifyOptions.Modify_MuKinetic:
+                        ExampleData.custom.Planes[0].MuKinetic = GetDouble();
+                        break;
+                    case ModifyOptions.Modify_Normal:
+                        ExampleData.custom.Planes[0].Normal = GetVector();
                         break;
                 }
             }
